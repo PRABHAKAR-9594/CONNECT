@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { supabase } from '@/lib/supabase/client'
@@ -23,10 +24,16 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
   const [messages, setMessages] = useState<Message[]>(initialMessages)
   const [body, setBody] = useState('')
   const [attaching, setAttaching] = useState(false)
+  const [sending, setSending] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [editingMessage, setEditingMessage] = useState<Message | null>(null)
   const [editBody, setEditBody] = useState('')
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
+  const router = useRouter()
+
+  useEffect(() => {
+    setMessages(initialMessages)
+  }, [initialMessages])
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -50,15 +57,22 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
 
     const messageText = body.trim()
     setBody('')
+    setSending(true)
 
     try {
-      const { error } = await supabase.from('messages').insert({
+      const { data: newMsg, error } = await supabase.from('messages').insert({
         conversation_id: conversation.id,
         sender_id: currentUserId,
         body: messageText || null,
-      })
+      }).select().single()
 
       if (error) throw error
+
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === newMsg.id)) return prev
+        return [...prev, newMsg as Message]
+      })
+      router.refresh()
 
       // Update last_message_at
       await supabase
@@ -70,6 +84,8 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
     } catch (err: any) {
       console.error('[send]', err)
       toast.error('Failed to send message.')
+    } finally {
+      setSending(false)
     }
   }
 
@@ -109,15 +125,21 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
       setUploadProgress(90)
 
       // Insert message
-      const { error: msgErr } = await supabase.from('messages').insert({
+      const { data: newMsg, error: msgErr } = await supabase.from('messages').insert({
         conversation_id: conversation.id,
         sender_id: currentUserId,
         file_url: signedData.signedUrl,
         file_type: isImage ? 'image' : 'document',
         file_name: file.name,
-      })
+      }).select().single()
 
       if (msgErr) throw msgErr
+
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === newMsg.id)) return prev
+        return [...prev, newMsg as Message]
+      })
+      router.refresh()
 
       await supabase
         .from('conversations')
@@ -216,7 +238,7 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
                   <Avatar src={otherProfile.avatar_url} name={otherProfile.full_name} size={32} />
                 )}
 
-                <div className={`max-w-[80%] md:max-w-md lg:max-w-lg rounded-2xl p-4 shadow-xl relative ${
+                <div className={`max-w-[80%] md:max-w-md lg:max-w-lg rounded-2xl p-4 shadow-xl relative overflow-hidden ${
                   msg.is_deleted
                     ? 'bg-slate-900/40 border border-slate-800 text-slate-500 italic'
                     : isMe
@@ -254,7 +276,7 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
                         )
                       ) : null}
 
-                      {msg.body ? <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.body}</p> : null}
+                      {msg.body ? <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-hidden">{msg.body}</p> : null}
 
                       <div className={`flex items-center justify-end gap-1.5 text-[10px] pt-1 ${isMe ? 'text-brand-200' : 'text-slate-400'}`}>
                         {msg.edited_at ? <span className="italic">(edited)</span> : null}
@@ -322,8 +344,8 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
       )}
 
       {/* Message Input */}
-      <div className="p-6 bg-slate-900/80 border-t border-slate-800 backdrop-blur-md shrink-0 z-20 shadow-2xl relative">
-        <div className="flex items-end gap-3 max-w-4xl mx-auto">
+      <div className="p-3 sm:p-6 bg-slate-900/95 border-t border-slate-800/80 backdrop-blur-xl shrink-0 z-20 shadow-2xl relative">
+        <div className="flex items-center gap-2 sm:gap-3 max-w-4xl mx-auto">
           <input
             type="file"
             ref={fileInputRef}
@@ -335,7 +357,7 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={attaching}
-            className="p-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-2xl border border-slate-800 hover:border-slate-700 transition-all shrink-0 shadow-lg"
+            className="p-2.5 sm:p-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl sm:rounded-2xl border border-slate-800 hover:border-slate-700 transition-all shrink-0 shadow-md"
             title="Attach File"
           >
             <Paperclip className="h-5 w-5" />
@@ -353,18 +375,19 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
                 handleSend()
               }
             }}
-            placeholder="Write a message... (Enter to send)"
+            placeholder="Write a message..."
             rows={1}
-            className="flex-1 bg-slate-950 border border-slate-800 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 max-h-32 resize-none shadow-inner"
+            className="flex-1 bg-slate-950/90 border border-slate-800/80 rounded-xl sm:rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 text-base sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 max-h-32 resize-none shadow-inner leading-normal flex items-center"
           />
 
           <Button
             onClick={handleSend}
             disabled={!body.trim() && !attaching}
-            className="bg-brand-600 text-white hover:bg-brand-500 p-3 rounded-2xl shadow-lg shadow-brand-600/20 shrink-0"
+            loading={sending || attaching}
+            className="bg-brand-600 text-white hover:bg-brand-500 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-lg shadow-brand-600/20 shrink-0"
             title="Send"
           >
-            <Send className="h-5 w-5" />
+            <Send className="h-5 w-5 shrink-0" />
           </Button>
         </div>
       </div>
