@@ -14,7 +14,7 @@ export default function LandingPage() {
       <main className="relative z-10 flex flex-col items-center text-center px-6 max-w-4xl animate-fade-in">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/50 border border-slate-700/50 text-brand-300 text-sm font-medium mb-8 backdrop-blur-sm">
           <span className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
-          Welcome to ConnectApp
+          Welcome to Connect
         </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white mb-6">
@@ -25,7 +25,7 @@ export default function LandingPage() {
         </h1>
 
         <p className="text-lg md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed">
-          ConnectApp is the premium platform for professionals to build meaningful connections, share ideas, and grow together. Drop the noise, focus on the network.
+          Connect is the premium platform for professionals to build meaningful connections, share ideas, and grow together. Drop the noise, focus on the network.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">

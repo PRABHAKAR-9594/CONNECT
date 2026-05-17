@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
-  title: "ConnectApp",
+  title: "Connect",
   description: "Connect with professionals and build your network.",
 };
 

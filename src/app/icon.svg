@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    <linearGradient id="leftRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="rightRing" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="100%" stop-color="#bae6fd" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)" />
+  <!-- Left connecting ring -->
+  <path d="M 220 156 C 140 156 96 200 96 256 C 96 312 140 356 220 356 C 265 356 295 330 316 296 L 262 264 C 250 284 238 296 220 296 C 180 296 156 276 156 256 C 156 236 180 216 220 216 C 238 216 250 228 262 248 L 316 216 C 295 182 265 156 220 156 Z" fill="url(#leftRing)" />
+  <!-- Right connecting ring -->
+  <path d="M 292 156 C 247 156 217 182 196 216 L 250 248 C 262 228 274 216 292 216 C 332 216 356 236 356 256 C 356 276 332 296 292 296 C 274 296 262 284 250 264 L 196 296 C 217 330 247 356 292 356 C 372 356 416 312 416 256 C 416 200 372 156 292 156 Z" fill="url(#rightRing)" />
+  <!-- Center connecting node -->
+  <circle cx="256" cy="256" r="28" fill="#38bdf8" />
+  <circle cx="256" cy="256" r="16" fill="#0f172a" />
+</svg>

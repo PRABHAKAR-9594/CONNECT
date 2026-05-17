@@ -41,7 +41,7 @@ export function Header({ profile }: HeaderProps) {
         <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-500 flex items-center justify-center shadow-md shadow-brand-500/30 shrink-0">
           <span className="font-bold text-white text-base tracking-wider">C</span>
         </div>
-        <span className="font-bold text-lg text-slate-50 tracking-tight truncate">ConnectApp</span>
+        <span className="font-bold text-lg text-slate-50 tracking-tight truncate">Connect</span>
       </Link>
 
       {/* User Profile & Sign Out */}

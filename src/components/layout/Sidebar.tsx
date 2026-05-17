@@ -82,7 +82,7 @@ export function Sidebar({ profile, initialRequestsCount }: SidebarProps) {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-500 to-indigo-500 flex items-center justify-center shadow-lg shadow-brand-500/30 shrink-0">
             <span className="font-bold text-white text-lg tracking-wider">C</span>
           </div>
-          <span className="font-bold text-xl text-slate-50 tracking-tight truncate">ConnectApp</span>
+          <span className="font-bold text-xl text-slate-50 tracking-tight truncate">Connect</span>
         </div>
 
         {/* Nav Links */}

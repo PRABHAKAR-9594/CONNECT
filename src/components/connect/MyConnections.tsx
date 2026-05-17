@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase/client'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import toast from 'react-hot-toast'
 import { orderPair } from '@/lib/utils'
 import type { Connection, Profile } from '@/types/app'
@@ -24,6 +25,7 @@ interface MyConnectionsProps {
 export function MyConnections({ initialConnections, currentUserId }: MyConnectionsProps) {
   const [connections, setConnections] = useState(initialConnections)
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [confirmingRemove, setConfirmingRemove] = useState<{ id: string; name: string } | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -85,8 +87,13 @@ export function MyConnections({ initialConnections, currentUserId }: MyConnectio
     }
   }
 
-  async function handleRemove(connId: string, name: string) {
-    if (!confirm(`Are you sure you want to remove ${name} from your connections?`)) return
+  function initiateRemove(connId: string, name: string) {
+    setConfirmingRemove({ id: connId, name })
+  }
+
+  async function handleRemoveConfirm() {
+    if (!confirmingRemove) return
+    const { id: connId, name } = confirmingRemove
     try {
       setLoadingId(connId)
       const { error } = await supabase
@@ -98,6 +105,7 @@ export function MyConnections({ initialConnections, currentUserId }: MyConnectio
 
       setConnections(prev => prev.filter(c => c.id !== connId))
       toast.success(`Removed ${name} from connections.`)
+      setConfirmingRemove(null)
     } catch (err: any) {
       console.error('[remove]', err)
       toast.error('Failed to remove connection.')
@@ -159,7 +167,7 @@ export function MyConnections({ initialConnections, currentUserId }: MyConnectio
                   <Button
                     size="sm"
                     variant="danger"
-                    onClick={() => handleRemove(conn.id, profile.full_name)}
+                    onClick={() => initiateRemove(conn.id, profile.full_name)}
                     disabled={isLoading}
                     className="bg-slate-800 text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-slate-700 px-3 py-2 shadow-lg"
                     title="Remove Connection"
@@ -172,6 +180,17 @@ export function MyConnections({ initialConnections, currentUserId }: MyConnectio
           })}
         </div>
       )}
+
+      <ConfirmModal
+        isOpen={!!confirmingRemove}
+        title="Remove Connection"
+        description={`Are you sure you want to remove ${confirmingRemove?.name} from your connections? This action cannot be undone.`}
+        confirmText="Remove"
+        onConfirm={handleRemoveConfirm}
+        onCancel={() => setConfirmingRemove(null)}
+        loading={loadingId === confirmingRemove?.id}
+        variant="danger"
+      />
     </div>
   )
 }

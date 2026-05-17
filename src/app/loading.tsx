@@ -16,7 +16,7 @@ export default function GlobalLoading() {
 
         {/* Text feedback */}
         <div className="space-y-2">
-          <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Loading ConnectApp</h3>
+          <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Loading Connect</h3>
           <p className="text-xs text-slate-400 max-w-[200px] mx-auto leading-relaxed">
             Preparing your professional network experience...
           </p>

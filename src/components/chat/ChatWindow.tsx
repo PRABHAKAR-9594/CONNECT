@@ -7,6 +7,7 @@ import Image from 'next/image'
 import { supabase } from '@/lib/supabase/client'
 import { Avatar } from '@/components/ui/Avatar'
 import { Button } from '@/components/ui/Button'
+import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { useRealtimeMessages } from '@/hooks/useRealtimeMessages'
 import { useChatPresence } from '@/hooks/useChatPresence'
 import toast from 'react-hot-toast'
@@ -29,6 +30,8 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
   const [editingMessage, setEditingMessage] = useState<Message | null>(null)
   const [editBody, setEditBody] = useState('')
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null)
+  const [deletingMsgId, setDeletingMsgId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -178,23 +181,30 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
     }
   }
 
-  async function handleDelete(msgId: string) {
-    if (!confirm('Are you sure you want to delete this message?')) return
+  function initiateDelete(msgId: string) {
+    setDeletingMsgId(msgId)
+    setActiveMenuId(null)
+  }
 
+  async function handleDeleteConfirm() {
+    if (!deletingMsgId) return
+    setIsDeleting(true)
     try {
       const { error } = await supabase
         .from('messages')
         .update({ is_deleted: true })
-        .eq('id', msgId)
+        .eq('id', deletingMsgId)
         .eq('sender_id', currentUserId)
 
       if (error) throw error
 
       toast.success('Message deleted.')
-      setActiveMenuId(null)
+      setDeletingMsgId(null)
     } catch (err: any) {
       console.error('[delete]', err)
       toast.error('Failed to delete message.')
+    } finally {
+      setIsDeleting(false)
     }
   }
 
@@ -304,7 +314,7 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
                             <Edit2 className="h-3.5 w-3.5" /> Edit
                           </button>
                           <button
-                            onClick={() => handleDelete(msg.id)}
+                            onClick={() => initiateDelete(msg.id)}
                             className="w-full px-3 py-1.5 text-xs text-red-400 hover:bg-red-500/10 flex items-center gap-2"
                           >
                             <Trash2 className="h-3.5 w-3.5" /> Delete
@@ -391,6 +401,17 @@ export function ChatWindow({ conversation, initialMessages, currentUserId }: Cha
           </Button>
         </div>
       </div>
+
+      <ConfirmModal
+        isOpen={!!deletingMsgId}
+        title="Delete Message"
+        description="Are you sure you want to delete this message? This action cannot be undone."
+        confirmText="Delete"
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeletingMsgId(null)}
+        loading={isDeleting}
+        variant="danger"
+      />
     </div>
   )
 }
