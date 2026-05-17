@@ -37,13 +37,13 @@ export default function RootLayout({
           crawlSpeed={200}
           height={3}
           crawl={true}
-          showSpinner={true}
+          showSpinner={false}
           easing="ease"
           speed={200}
           shadow="0 0 10px #0284c7,0 0 5px #0284c7"
           zIndex={1600}
         />
-        <Toaster 
+        <Toaster
           position="top-center"
           toastOptions={{
             style: {

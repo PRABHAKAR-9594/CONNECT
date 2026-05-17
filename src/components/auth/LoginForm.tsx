@@ -54,6 +54,8 @@ export function LoginForm() {
 
   async function handleGoogleOAuth() {
     try {
+
+      console.log("URL", process.env.NEXT_PUBLIC_APP_URL);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
