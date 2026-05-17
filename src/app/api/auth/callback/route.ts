@@ -5,7 +5,6 @@ export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || origin
-  console.log("appUrl", appUrl);
   if (code) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)

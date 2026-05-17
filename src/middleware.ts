@@ -27,7 +27,8 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   const isAuthPage = request.nextUrl.pathname.startsWith('/auth')
-  const isProtected = !isAuthPage && request.nextUrl.pathname !== '/'
+  const isApiPage = request.nextUrl.pathname.startsWith('/api')
+  const isProtected = !isAuthPage && !isApiPage && request.nextUrl.pathname !== '/'
 
   if (isProtected && !user) {
     const redirectUrl = request.nextUrl.clone()
