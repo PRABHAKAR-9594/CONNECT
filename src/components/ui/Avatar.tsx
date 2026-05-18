@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 interface AvatarProps {
   src?: string | null
-  name: string
+  name?: string | null
   size?: number
 }
 
@@ -12,7 +12,7 @@ export function Avatar({ src, name, size = 40 }: AvatarProps) {
     return (
       <Image
         src={src}
-        alt={name}
+        alt={name || 'User'}
         width={size}
         height={size}
         className="rounded-full object-cover shrink-0"

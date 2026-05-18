@@ -38,8 +38,15 @@ export function truncate(str: string, maxLen: number): string {
 }
 
 // Get initials for avatar fallback
-export function getInitials(name: string): string {
-  return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+export function getInitials(name?: string | null): string {
+  if (!name || !name.trim()) return 'U'
+  const parts = name.trim().split(/\s+/)
+  if (parts.length === 1) {
+    return parts[0][0].toUpperCase()
+  }
+  const first = parts[0][0].toUpperCase()
+  const last = parts[parts.length - 1][0].toUpperCase()
+  return `${first}${last}`
 }
 
 // Ensure connection pair is always ordered (user_a < user_b)
