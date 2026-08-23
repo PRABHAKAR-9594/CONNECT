@@ -38,6 +38,7 @@ export async function GET() {
       )
     }
 
+    console.log("Health check query executed successfully")
     return NextResponse.json({
       status: 'ok',
       message: 'Health check query executed successfully',
